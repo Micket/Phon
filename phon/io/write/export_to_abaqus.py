@@ -113,8 +113,8 @@ def write_column_broken_array(int_array, f):
     Writes an array to a file and inserts a new line every fifteen element
     as required by Abaqus.
 
-    :param array: The array to write to the file
-    :type array: array
+    :param int_array: The array to write to the file
+    :type int_array: array
     :param f: The file to write the array to
     :type f: file object
 

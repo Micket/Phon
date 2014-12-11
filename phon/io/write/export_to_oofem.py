@@ -76,15 +76,15 @@ def export_to_oofem(filename, mesh, write_2d_elements=False):
     f.write("ncrosssect " + str(n_cs) + " ")
     f.write("ndofman " + str(len(mesh.nodes)) + " ")
     f.write("nelem " + str(n_elements) + " ")
-    f.write("nset " + str(n_set) + " ");
+    f.write("nset " + str(n_set) + " ")
     f.write("nmat " + str(n_cs) + " ")
     f.write("nbc 2 nic 0 nltf 2")
-    f.write("\n");
+    f.write("\n")
 
     # Write nodes
     for node_id, node in mesh.nodes.items():
         f.write("node {0:d} ".format(node_id))
-        f.write("coords 3 {:.12e} {:.12e} {:.12e} ".format(node.c[0], node.c[1], node.c[2]))
+        f.write("coords 3 {:.12e} {:.12e} {:.12e} ".format(*node.c))
         f.write("\n")
 
     #  Elements

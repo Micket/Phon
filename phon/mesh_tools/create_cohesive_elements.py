@@ -41,7 +41,10 @@ def create_cohesive_elements(mesh):
     n_nodes = len(mesh.nodes)
     cohesive_id_offset = max(mesh.elements.keys()) + 1
 
+    # TODO Shouldn't use this in the future, even for NEPER input
     node_id_grain_lut = get_node_id_grain_lut(mesh)
+    element_id_grain_lut = get_element_id_grain_lut(mesh)
+    node_id_element_lut = get_node_id_element_lut(mesh)
 
     for element_set_name in mesh.element_sets.keys():
         if not element_set_name[0:4] == "face":
@@ -86,6 +89,7 @@ def create_cohesive_elements(mesh):
             # Reconnect the tetrahedron with a vertex in the node that is being duplicated
             # to one of the new nodes.
             grain_ids, tetra_ids = get_tetra_and_grain_with_node_id(mesh, node_id, grain_id_1, grain_id_2)
+            #grain_ids, tetra_ids = get_tetra_and_grain_with_node_id(mesh, node_id, grain_id_1, grain_id_2)
             for grain_id, tetra_id in zip(grain_ids, tetra_ids):
                 idx = mesh.elements[tetra_id].vertices.index(node_id)
                 mesh.elements[tetra_id].vertices[idx] = node_id + n_nodes * grain_id
@@ -260,6 +264,32 @@ def get_node_id_grain_lut(mesh):
             vertices = mesh.elements[element_id].vertices
             for node_id in vertices:
                 d[node_id].add(int(element_set_name[4:]))
+    return d
+
+
+def get_node_id_element_lut(mesh):
+    """
+    This function creates a dictionary that works as a lookup table for what nodes are connected to which elements.
+    :param mesh: The mesh
+    :type: mesh: :class:`Mesh`
+    :return: Dictionary d where d[node_id] gives a set of the element identifiers that contain the node.
+    :rtype: defaultdict
+    """
+    d = defaultdict(set)
+    for element_id, element in mesh.elements.items():
+        if len(element.vertices) != 4:
+            continue
+        for node_id in element.vertices:
+            d[node_id].add(element_id)
+    return d
+
+
+def get_element_id_grain_lut(mesh):
+    d = defaultdict(set)
+    for element_set_name, element_set in mesh.element_sets.items():
+        if element_set_name.startswith("poly"):
+            for element_id, element in mesh.elements.items():
+                d[element_id].add(int(element_set_name[4:]))
     return d
 
 
